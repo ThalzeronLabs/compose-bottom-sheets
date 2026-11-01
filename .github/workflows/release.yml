@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build the release AAR
+        run: ./gradlew :sheets:assembleRelease
+        env:
+          VERSION: ${{ github.ref_name }}
+
+      # Notes = the CHANGELOG section for this version (e.g. "## [0.1.0]" for tag v0.1.0).
+      - name: Extract release notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found && /^\[.*\]: / { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          cat >> notes.md <<NOTES
+
+          ## Install
+
+          \`\`\`kotlin
+          // settings.gradle.kts → repositories { maven("https://jitpack.io") }
+          implementation("com.github.ThalzeronLabs:compose-bottom-sheets:${GITHUB_REF_NAME}")
+          \`\`\`
+          NOTES
+          test -s notes.md
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp sheets/build/outputs/aar/sheets-release.aar "compose-bottom-sheets-${GITHUB_REF_NAME}.aar"
+          gh release create "$GITHUB_REF_NAME" \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            "compose-bottom-sheets-${GITHUB_REF_NAME}.aar"
