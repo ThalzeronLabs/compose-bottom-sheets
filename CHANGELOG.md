@@ -18,7 +18,7 @@ First public release.
 - Publishing through JitPack: `com.github.ThalzeronLabs:compose-bottom-sheets:v0.1.0`.
 - Screenshot tests with Robolectric + Roborazzi; the images in `docs/screenshots/` are verified in CI.
 - Dokka API docs and a GitHub Pages workflow.
-- A release workflow: pushing a `v*` tag creates the GitHub release from this changelog, with the AAR attached.
+- A release workflow (tag push or manual run) that creates the GitHub release from this changelog, with the AAR attached.
 - `CONTRIBUTING.md`, issue and pull request templates.
 
 ### Fixed

@@ -57,8 +57,8 @@ PRs are squash-merged, so the PR title becomes the commit message — write it i
 
 ## Releases
 
-Maintainers move the `[Unreleased]` notes under a new version heading in `CHANGELOG.md`, then tag `vX.Y.Z` on `main`.
-The `Release` workflow creates the GitHub release from that changelog section; JitPack builds the tag on first request.
+Maintainers move the `[Unreleased]` notes under a new version heading in `CHANGELOG.md`, then either push a `vX.Y.Z` tag or run the `Release` workflow on `main` from the Actions tab.
+It creates the GitHub release from that changelog section; JitPack builds the tag on first request.
 The project follows [Semantic Versioning](https://semver.org/); while it's `0.x`, minor versions may change the API.
 
 ## Code of conduct

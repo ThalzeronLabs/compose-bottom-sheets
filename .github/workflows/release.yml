@@ -1,8 +1,15 @@
 name: Release
 
 on:
+  # Either push a tag (git push origin v1.2.3) ...
   push:
     tags: ['v*']
+  # ... or run it from the Actions tab on main; the workflow then creates the tag itself.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag to create, e.g. v0.2.0 (needs a matching "## [0.2.0]" section in CHANGELOG.md)
+        required: true
 
 permissions:
   contents: write
@@ -11,7 +18,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
     steps:
+      - name: Check the inputs
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]] || { echo "::error::'$TAG' is not a vX.Y.Z tag"; exit 1; }
+          [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::Run this workflow on main"; exit 1; }
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-java@v4
@@ -24,36 +39,40 @@ jobs:
       - name: Build the release AAR
         run: ./gradlew :sheets:assembleRelease
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ env.TAG }}
 
       # Notes = the CHANGELOG section for this version (e.g. "## [0.1.0]" for tag v0.1.0).
       - name: Extract release notes
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${TAG#v}"
           awk -v v="$version" '
             $0 ~ "^## \\[" v "\\]" { found = 1; next }
             found && /^## \[/ { exit }
             found && /^\[.*\]: / { exit }
             found { print }
           ' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "::error::No '## [$version]' section in CHANGELOG.md"; exit 1; }
           cat >> notes.md <<NOTES
 
           ## Install
 
           \`\`\`kotlin
           // settings.gradle.kts → repositories { maven("https://jitpack.io") }
-          implementation("com.github.ThalzeronLabs:compose-bottom-sheets:${GITHUB_REF_NAME}")
+          implementation("com.github.ThalzeronLabs:compose-bottom-sheets:${TAG}")
           \`\`\`
           NOTES
-          test -s notes.md
 
       - name: Create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp sheets/build/outputs/aar/sheets-release.aar "compose-bottom-sheets-${GITHUB_REF_NAME}.aar"
-          gh release create "$GITHUB_REF_NAME" \
-            --verify-tag \
-            --title "$GITHUB_REF_NAME" \
+          cp sheets/build/outputs/aar/sheets-release.aar "compose-bottom-sheets-${TAG}.aar"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            where=(--target "$GITHUB_SHA")   # creates the tag on this commit
+          else
+            where=(--verify-tag)             # the pushed tag must already exist
+          fi
+          gh release create "$TAG" "${where[@]}" \
+            --title "$TAG" \
             --notes-file notes.md \
-            "compose-bottom-sheets-${GITHUB_REF_NAME}.aar"
+            "compose-bottom-sheets-${TAG}.aar"
