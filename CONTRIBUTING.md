@@ -12,7 +12,7 @@ Thanks for taking the time! This is a small library, so small pull requests are 
 
 ## Set up
 
-You need JDK 17+ and the Android SDK (Android Studio installs both).
+You need JDK 21 (Robolectric needs it for Android 16 screenshots) and the Android SDK; Android Studio ships both.
 
 ```bash
 git clone https://github.com/ThalzeronLabs/compose-bottom-sheets.git
