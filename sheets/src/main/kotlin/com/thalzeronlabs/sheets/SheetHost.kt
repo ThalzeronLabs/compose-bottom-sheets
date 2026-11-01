@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +35,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -59,7 +63,7 @@ fun SheetHost(state: SheetHostState) {
             Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = SheetPadding)
                 .padding(bottom = 24.dp)
                 .navigationBarsPadding(),
         ) {
@@ -130,7 +134,15 @@ private fun <T> ChooseContent(request: SheetRequest.Choose<T>, finish: (() -> Un
 @Composable
 private fun DateContent(request: SheetRequest.PickDate, finish: (() -> Unit) -> Unit) {
     val picker = rememberDatePickerState(initialSelectedDateMillis = request.initialUtcMillis)
-    DatePicker(state = picker, title = null, headline = null, showModeToggle = false)
+    // The Material 3 DatePicker needs 360dp; let it use the sheet's side padding so it isn't clipped on 360dp phones.
+    DatePicker(
+        state = picker,
+        modifier = Modifier.bleed(SheetPadding),
+        title = null,
+        headline = null,
+        showModeToggle = false,
+        colors = DatePickerDefaults.colors(containerColor = Color.Transparent),
+    )
     ConfirmRow(
         enabled = picker.selectedDateMillis != null,
         onConfirm = { finish { request.resolver.resolve(picker.selectedDateMillis) } },
@@ -171,6 +183,17 @@ private fun InputContent(request: SheetRequest.Input, finish: (() -> Unit) -> Un
         onConfirm = { finish { request.resolver.resolve(text) } },
         onCancel = { finish { request.dismiss() } },
     )
+}
+
+private val SheetPadding = 24.dp
+
+/** Lets content extend [horizontal] past the parent's padding on both sides. */
+private fun Modifier.bleed(horizontal: Dp) = layout { measurable, constraints ->
+    val extra = if (constraints.hasBoundedWidth) (horizontal * 2).roundToPx() else 0
+    val placeable = measurable.measure(
+        constraints.copy(minWidth = constraints.minWidth + extra, maxWidth = constraints.maxWidth + extra),
+    )
+    layout(placeable.width - extra, placeable.height) { placeable.place(-extra / 2, 0) }
 }
 
 @Composable

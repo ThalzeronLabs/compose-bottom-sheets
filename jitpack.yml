@@ -1,0 +1,5 @@
+# JitPack builds the tag and serves com.github.ThalzeronLabs:compose-bottom-sheets:<tag>.
+jdk:
+  - openjdk17
+install:
+  - ./gradlew :sheets:publishReleasePublicationToMavenLocal --no-daemon --stacktrace

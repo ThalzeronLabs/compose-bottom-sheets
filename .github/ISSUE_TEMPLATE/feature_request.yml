@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest a new sheet type or an improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you want to ask the user?
+      description: The question your app needs answered, and why the existing sheets don't cover it.
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: How the call would look from a coroutine, and what it returns.
+      render: kotlin
+      placeholder: |
+        val tags: List<Tag>? = sheets.chooseMany("Tags", options)
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to implement this myself.

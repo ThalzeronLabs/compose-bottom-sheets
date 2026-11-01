@@ -1,0 +1,36 @@
+name: Bug report
+description: Something doesn't work as documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead. Screenshots help a lot for UI bugs.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal code to reproduce
+      description: The smallest composable / call that shows the problem.
+      render: kotlin
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Library version
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: compose
+    attributes:
+      label: Compose BOM / Material 3 version
+      placeholder: 2026.09.00
+  - type: input
+    id: device
+    attributes:
+      label: Device / emulator and Android version
+      placeholder: Pixel 8, Android 16
