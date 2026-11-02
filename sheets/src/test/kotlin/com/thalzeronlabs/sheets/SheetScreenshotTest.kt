@@ -2,20 +2,34 @@ package com.thalzeronlabs.sheets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureScreenRoboImage
+import kotlinx.coroutines.awaitCancellation
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,6 +96,38 @@ class SheetScreenshotTest {
         )
     }
 
+    @Test
+    fun pickDateRange() = snapshot("pick-date-range") {
+        pickDateRange(
+            title = "Trip dates",
+            initial = DateRange(MARCH_12_2026_UTC, MARCH_12_2026_UTC + 3 * DAY),
+        )
+    }
+
+    @Test
+    fun rate() = snapshot("rate") {
+        // Also shows a per-call accent: the stars and the button take it, the rest of the theme stays the app's.
+        rate(
+            title = "Rate your stay",
+            message = "How was your trip to Lisbon?",
+            initial = 4,
+            accent = DEEP_AMBER,
+        )
+    }
+
+    @Test
+    fun progress() = snapshot("progress") {
+        withProgress(title = "Uploading photos", message = "2 of 3 uploaded") {
+            fraction = 2 / 3f
+            awaitCancellation()
+        }
+    }
+
+    @Test
+    fun custom() = snapshot("custom") {
+        custom<Int>(title = "Quantity") { QuantityPicker() }
+    }
+
     private fun snapshot(name: String, ask: suspend SheetHostState.() -> Unit) {
         compose.setContent {
             MaterialTheme {
@@ -98,6 +144,37 @@ class SheetScreenshotTest {
     private companion object {
         const val SCREENSHOT_DIR = "../docs/screenshots"
         const val MARCH_12_2026_UTC = 1_773_273_600_000L
+        const val DAY = 86_400_000L
+        val DEEP_AMBER = Color(0xFFA15C00)
+    }
+}
+
+/** What an app might pass to `custom`: a stepper and a button that answers with the count. */
+@Composable
+private fun SheetScope<Int>.QuantityPicker() {
+    var count by remember { mutableIntStateOf(2) }
+    Text(
+        "Lisbon city card, 72 h",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(16.dp))
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OutlinedIconButton(onClick = { if (count > 1) count-- }, Modifier.semantics { contentDescription = "Fewer" }) {
+            Text("−", style = MaterialTheme.typography.titleLarge)
+        }
+        Text("$count", style = MaterialTheme.typography.headlineMedium)
+        OutlinedIconButton(onClick = { count++ }, Modifier.semantics { contentDescription = "More" }) {
+            Text("+", style = MaterialTheme.typography.titleLarge)
+        }
+    }
+    Spacer(Modifier.height(20.dp))
+    Button(onClick = { answer(count) }, Modifier.fillMaxWidth().height(52.dp), shape = MaterialTheme.shapes.large) {
+        Text("Add to cart · €${count * 29}")
     }
 }
 

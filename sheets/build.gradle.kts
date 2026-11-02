@@ -8,7 +8,7 @@ plugins {
 
 // JitPack sets VERSION to the git tag (e.g. v0.1.0); local builds fall back to the current release line.
 group = "com.github.ThalzeronLabs"
-version = providers.environmentVariable("VERSION").getOrElse("0.1.0")
+version = providers.environmentVariable("VERSION").getOrElse("0.2.0")
 
 android {
     namespace = "com.thalzeronlabs.sheets"
@@ -68,7 +68,10 @@ publishing {
 
             pom {
                 name.set("compose-bottom-sheets")
-                description.set("Material 3 bottom sheets for Jetpack Compose that you can await: confirm, choose, pickDate, pickTime and input.")
+                description.set(
+                    "Material 3 bottom sheets for Jetpack Compose that you can await: confirm, choose, pickDate, " +
+                        "pickDateRange, pickTime, input, rate, withProgress and custom.",
+                )
                 url.set("https://github.com/ThalzeronLabs/compose-bottom-sheets")
                 licenses {
                     license {
@@ -107,5 +110,7 @@ dependencies {
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.roborazzi.junit.rule)
     testImplementation(libs.androidx.compose.ui.test.junit4)
+    // Accessibility Test Framework checks (labels, touch targets, contrast) on every sheet.
+    testImplementation(libs.androidx.compose.ui.test.junit4.accessibility)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -23,6 +23,10 @@ cd compose-bottom-sheets
 That one command runs everything CI runs for tests:
 
 - `SheetHostStateTest` — plain JVM tests of the request queue, answers, dismissal and cancellation.
+- `SheetAccessibilityTest` — one test per sheet: labels, 48dp touch targets, reading order.
+- `SheetContrastTest` — WCAG contrast of the color pairs the sheets draw.
+- `SheetHostTest` — real taps on rendered sheets (queueing, answers, the progress sheet closing itself).
+- `SheetThemeTest` — the app's `MaterialTheme` and per-call accents reach the rendered sheet.
 - `SheetScreenshotTest` — renders each sheet with Robolectric and compares it with `docs/screenshots/*.png`.
 
 ## Screenshots
@@ -37,7 +41,8 @@ The PNGs in `docs/screenshots/` are both the README gallery and the expected out
 
 - If `verifyRoborazziDebug` fails and you **didn't** mean to change the UI, look at
   `sheets/build/outputs/roborazzi/*_compare.png` (CI uploads them as the `screenshot-diffs` artifact).
-- A **new sheet type** should come with a new test in `SheetScreenshotTest` and a row in the README gallery.
+- A **new sheet type** should come with a new test in `SheetScreenshotTest`, one in `SheetAccessibilityTest`, and a
+  cell in the README gallery.
 
 ## Code style
 
