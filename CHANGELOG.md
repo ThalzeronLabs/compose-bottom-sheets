@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- The drag handle's touch target was 32dp wide, below the 48dp that the Accessibility Test Framework requires (found
+  by an app using the library). It now sits in a 48 x 48dp target and is drawn exactly as before. It keeps Material's
+  translated label ("Drag handle") and the dismiss action. `SheetAccessibilityTest` checks the handle's own bounds in
+  every dismissible sheet, and now also covers controls that only offer accessibility actions.
+
 ## [0.2.1] - 2026-11-02
 
 Typed text and ratings survive rotation, the public API is guarded in CI, and there is a sample app.

@@ -230,7 +230,8 @@ how to check.
 
 - **Labels.** Every tappable element has text or a content description; each star is read as "3 of 5 stars"
   (`starLabel` lets you translate it), and a `choose` option is read as one item, label and description together.
-- **Touch targets.** Everything tappable is at least 48 x 48dp (buttons are 52dp tall, stars 56dp).
+- **Touch targets.** Everything tappable is at least 48 x 48dp (buttons are 52dp tall, stars 56dp), including the
+  drag handle: it is drawn as Material's 32 x 4dp bar, inside a 48 x 48dp target.
 - **Focus order** follows what you see: title, content, then the buttons from left to right.
 - **Live updates.** The progress message is a polite live region and the bar exposes its value; the progress sheet has
   no drag handle or close action, because it can't be dismissed.

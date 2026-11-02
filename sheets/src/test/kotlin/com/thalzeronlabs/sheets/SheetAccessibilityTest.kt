@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.contentDescription
@@ -30,6 +31,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -183,26 +185,56 @@ class SheetAccessibilityTest {
     }
 
     /**
-     * Every node TalkBack can activate has something to say and is at least 48 x 48dp to touch.
+     * Every node TalkBack can activate has something to say and offers at least a 48 x 48dp touch target.
+     * "Activate" includes nodes that only offer accessibility actions such as dismiss, expand or collapse.
      * Nodes clipped out of view (months a lazy calendar keeps composed off-screen) can't be reached, so they're skipped.
+     * Then the drag handle gets the stricter check of [assertDragHandleIsReachable].
      */
-    private fun assertActionsAreLabelledAndLargeEnough() {
+    private fun assertActionsAreLabelledAndLargeEnough(dragHandle: Boolean = true) {
         val nodes = visibleActions()
         assertTrue("the sheet has no actions", nodes.isNotEmpty())
-        nodes.forEach { node ->
+        val problems = nodes.mapNotNull { node ->
             val label = node.spokenText()
-            assertTrue("action without a label: ${node.config}", label.isNotBlank())
             val touch = node.touchBoundsInRoot
             with(node.layoutInfo.density) {
                 val width = touch.width.toDp()
                 val height = touch.height.toDp()
-                assertTrue("'$label' touch target is $width x $height", width >= MIN_TOUCH && height >= MIN_TOUCH)
+                when {
+                    label.isBlank() -> "action without a label: ${node.config}"
+                    width < MIN_TOUCH || height < MIN_TOUCH -> "'$label' touch target is $width x $height"
+                    else -> null
+                }
             }
         }
+        assertTrue(problems.joinToString("\n"), problems.isEmpty())
+        if (dragHandle) assertDragHandleIsReachable()
+    }
+
+    /**
+     * The drag handle is the one control every dismissible sheet has. Its own bounds, which is what it reports to
+     * accessibility services and what the Accessibility Test Framework's `TouchTargetSizeCheck` measures on a
+     * device, must be 48 x 48dp, not just Compose's enlarged touch area: Material's default handle is a 32dp-wide
+     * target that ATF reports as too small. It must also be labelled and offer the dismiss action.
+     */
+    private fun assertDragHandleIsReachable() {
+        val handle = compose.onNode(hasContentDescription("Drag handle", substring = true) and hasClickAction())
+            .fetchSemanticsNode()
+        with(handle.layoutInfo.density) {
+            val width = handle.boundsInRoot.width.toDp()
+            val height = handle.boundsInRoot.height.toDp()
+            assertTrue("drag handle is $width x $height, below $MIN_TOUCH", width >= MIN_TOUCH && height >= MIN_TOUCH)
+        }
+        assertTrue("drag handle has no dismiss action", SemanticsActions.Dismiss in handle.config)
     }
 
     private fun visibleActions(): List<SemanticsNode> =
-        compose.onAllNodes(hasClickAction()).fetchSemanticsNodes().filterNot { it.boundsInRoot.isEmpty }
+        compose.onAllNodes(hasClickAction() or hasAccessibilityAction()).fetchSemanticsNodes()
+            .filterNot { it.boundsInRoot.isEmpty }
+
+    private fun hasAccessibilityAction() = SemanticsMatcher("has dismiss, expand or collapse") { node ->
+        listOf(SemanticsActions.Dismiss, SemanticsActions.Expand, SemanticsActions.Collapse)
+            .any { it in node.config }
+    }
 
     /**
      * [labels] appear in this order when walking the semantics tree depth-first, which is the order TalkBack and

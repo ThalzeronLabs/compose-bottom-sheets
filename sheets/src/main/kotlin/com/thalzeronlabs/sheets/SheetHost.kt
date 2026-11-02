@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -123,7 +124,7 @@ private fun Sheet(request: SheetRequest<*>) {
         onDismissRequest = { request.dismiss() },
         sheetState = sheetState,
         sheetGesturesEnabled = dismissible,
-        dragHandle = if (dismissible) ({ BottomSheetDefaults.DragHandle() }) else null,
+        dragHandle = if (dismissible) ({ AccessibleDragHandle() }) else null,
         properties = ModalBottomSheetProperties(
             shouldDismissOnBackPress = dismissible,
             shouldDismissOnClickOutside = dismissible,
@@ -393,7 +394,22 @@ private fun <T> CustomContent(request: SheetRequest.Custom<T>, finish: (() -> Un
     request.content(scope)
 }
 
+/**
+ * Material's drag handle, drawn exactly the same (a 32 x 4dp bar with 22dp above and below), inside a 48 x 48dp box.
+ * Material's own handle is only 32dp wide, which accessibility checkers report as a too-small touch target.
+ * `ModalBottomSheet` merges this box into the node it gives the label ("Drag handle", from Material's translations)
+ * and the dismiss action, so that node is now 48 x 48dp.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AccessibleDragHandle() {
+    Box(Modifier.sizeIn(minWidth = MinTouchTarget, minHeight = MinTouchTarget), contentAlignment = Alignment.Center) {
+        BottomSheetDefaults.DragHandle()
+    }
+}
+
 private val SheetPadding = 24.dp
+private val MinTouchTarget = 48.dp
 private val ButtonHeight = 52.dp
 private val StarTouchSize = 56.dp
 private val StarSize = 40.dp
