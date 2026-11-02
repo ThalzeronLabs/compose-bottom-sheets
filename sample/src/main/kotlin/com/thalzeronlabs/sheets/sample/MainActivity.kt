@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -166,7 +167,7 @@ private fun DemoButton(label: String, onClick: () -> Unit) {
 /** Content for `custom`: a stepper and a button that answers with the count. */
 @Composable
 private fun SheetScope<Int>.QuantityPicker() {
-    var count by remember { mutableIntStateOf(1) }
+    var count by rememberSaveable { mutableIntStateOf(1) }
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),

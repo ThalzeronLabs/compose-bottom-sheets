@@ -171,5 +171,7 @@ dependencies {
     testImplementation(libs.androidx.compose.ui.test.junit4)
     // Accessibility Test Framework checks (labels, touch targets, contrast) on every sheet.
     testImplementation(libs.androidx.compose.ui.test.junit4.accessibility)
+    // Recreation tests: a real activity with setContent and a real ViewModel.
+    testImplementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -26,6 +26,7 @@ That one command runs everything CI runs for tests:
 - `SheetAccessibilityTest` — one test per sheet: labels, 48dp touch targets, reading order.
 - `SheetContrastTest` — WCAG contrast of the color pairs the sheets draw.
 - `SheetHostTest` — real taps on rendered sheets (queueing, answers, the progress sheet closing itself).
+- `SheetRecreationTest` — a real activity recreation (rotation) and emulated process death with a real ViewModel.
 - `SheetThemeTest` — the app's `MaterialTheme` and per-call accents reach the rendered sheet.
 - `SheetScreenshotTest` — renders each sheet with Robolectric and compares it with `docs/screenshots/*.png`.
 

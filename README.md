@@ -128,7 +128,7 @@ The user can't swipe it away; cancel the calling coroutine to stop the work. Ope
 
 ```kotlin
 val quantity: Int? = sheets.custom("Quantity") {
-    var count by remember { mutableIntStateOf(1) }
+    var count by rememberSaveable { mutableIntStateOf(1) }
     Stepper(count, onChange = { count = it })
     Button(onClick = { answer(count) }) { Text("Add to cart") }   // dismiss() returns null
 }
@@ -169,6 +169,46 @@ on the JVM with Robolectric + [Roborazzi](https://github.com/takahirom/roborazzi
 - **Swipe to dismiss = no answer.** `confirm` returns `false`, everything else returns `null`.
 - **The sheet animates out before your code continues**, so the next UI change never fights the closing sheet.
 - **Theming comes from your `MaterialTheme`**, with an optional accent per call.
+- **Survives rotation** when the state lives in a ViewModel (below).
+
+## Rotation, dark mode and process death
+
+A configuration change (rotation, dark mode, language, window resize) recreates the activity. What happens to an open
+sheet depends on who owns the `SheetHostState` and the coroutine that asked.
+
+**In a ViewModel: the sheet survives.** It stays open, keeps what the user already entered (typed text, the chosen
+star, the picked date, range or time, the progress) and still answers the coroutine that asked:
+
+```kotlin
+class NoteViewModel : ViewModel() {
+    val sheets = SheetHostState()
+
+    fun rename(note: Note) = viewModelScope.launch {
+        val title = sheets.input("Rename note", note.title) ?: return@launch
+        repository.rename(note, title)
+    }
+}
+
+@Composable
+fun NoteScreen(viewModel: NoteViewModel = viewModel()) {
+    SheetHost(viewModel.sheets)
+    // ...
+}
+```
+
+**With `remember` and `rememberCoroutineScope()`: the question is cancelled.** The scope dies with the old
+composition, so the sheet closes and the caller gets a `CancellationException`, like any other cancellation. That is
+fine for quick, throw-away questions; use a ViewModel when losing the answer would hurt.
+
+**After process death** (or with "Don't keep activities"), the ViewModel and the coroutine waiting for the answer are
+gone too: a suspended call can't be brought back. The screen comes back without the sheet, and the next call opens a
+fresh one. If a half-finished flow must survive that, save its progress yourself (e.g. in `SavedStateHandle`) and ask
+again.
+
+**Your own `custom` content** keeps its state across a configuration change if it uses `rememberSaveable` instead of
+`remember`.
+
+`SheetRecreationTest` checks all of this with a real activity recreation and a real ViewModel.
 
 ## Theming
 
@@ -226,13 +266,14 @@ every release and once a week.
 ./gradlew :sheets:verifyRoborazziDebug
 ```
 
-That runs 51 tests on the JVM, no emulator:
+That runs 61 tests on the JVM, no emulator:
 
 | Test class | What it covers |
 |---|---|
 | `SheetHostStateTest` (22) | the request queue, answers, dismissals, cancellation, progress and custom sheets |
 | `SheetAccessibilityTest` (9) | one per sheet: labels, 48dp touch targets, reading order, roles, live regions |
 | `SheetContrastTest` (4) | WCAG contrast of the color pairs, light and dark, with and without accents |
+| `SheetRecreationTest` (10) | rotation and process death: state kept in each sheet, the two ownership patterns |
 | `SheetHostTest` (4) | real taps on rendered sheets: queueing, progress closing itself, custom and rating answers |
 | `SheetThemeTest` (3) | the app's `MaterialTheme` is used, and an accent overrides it for one sheet |
 | `SheetScreenshotTest` (9) | renders every sheet and compares it with `docs/screenshots/` |
