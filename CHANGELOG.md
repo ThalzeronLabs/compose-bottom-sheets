@@ -11,6 +11,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Public API guard: the binary-compatibility-validator dumps the public API to `sheets/api/sheets.api`, and CI runs
   `./gradlew :sheets:apiCheck`, so an API change can't slip in unnoticed. Update the dump with `./gradlew :sheets:apiDump`.
 
+- `sample/`: a one-screen app with a button for every sheet (`./gradlew :sample:installDebug`). CI builds it against
+  the library, and a new **Consumer check** workflow builds it against the artifact JitPack serves for the latest
+  release (after every release, weekly, and on demand).
 - The API docs (Dokka) are published on GitHub Pages: https://thalzeronlabs.github.io/compose-bottom-sheets/
 
 ### Removed

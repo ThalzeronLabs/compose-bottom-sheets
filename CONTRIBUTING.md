@@ -44,6 +44,12 @@ The PNGs in `docs/screenshots/` are both the README gallery and the expected out
 - A **new sheet type** should come with a new test in `SheetScreenshotTest`, one in `SheetAccessibilityTest`, and a
   cell in the README gallery.
 
+## Sample app
+
+`sample/` shows every sheet; CI builds it on each pull request. If you add a sheet, add a button for it in
+`MainActivity.kt`. The **Consumer check** workflow builds the sample against the latest release on JitPack, so a new
+sheet only appears there after it has been released.
+
 ## Public API
 
 `sheets/api/sheets.api` is the library's public API, as the binary-compatibility-validator sees it in the release AAR.
