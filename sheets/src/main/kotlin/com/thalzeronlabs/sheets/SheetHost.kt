@@ -50,6 +50,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -275,7 +276,7 @@ private fun TimeContent(request: SheetRequest.PickTime, finish: (() -> Unit) -> 
 
 @Composable
 private fun InputContent(request: SheetRequest.Input, finish: (() -> Unit) -> Unit) {
-    var text by remember { mutableStateOf(request.initial) }
+    var text by rememberSaveable { mutableStateOf(request.initial) }
     val error = request.validate(text)
     OutlinedTextField(
         value = text,
@@ -296,7 +297,7 @@ private fun InputContent(request: SheetRequest.Input, finish: (() -> Unit) -> Un
 
 @Composable
 private fun RateContent(request: SheetRequest.Rate, finish: (() -> Unit) -> Unit) {
-    var rating by remember { mutableIntStateOf(request.initial) }
+    var rating by rememberSaveable { mutableIntStateOf(request.initial) }
     request.message?.let {
         Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))

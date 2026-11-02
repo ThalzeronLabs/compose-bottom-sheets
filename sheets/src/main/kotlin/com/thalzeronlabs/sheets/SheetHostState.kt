@@ -36,6 +36,10 @@ import kotlin.coroutines.resume
  * One sheet at a time: a second request waits until the first is answered. Cancelling the calling coroutine
  * closes its sheet. Swiping the sheet away answers `false` / `null`.
  *
+ * Keep it in a ViewModel and ask from `viewModelScope` to survive configuration changes: the open sheet stays, with
+ * what the user already entered, and still answers. With `remember` and `rememberCoroutineScope()` a configuration
+ * change cancels the question instead.
+ *
  * Every sheet takes an optional `accent` color. When it is null the sheet uses your `MaterialTheme` as is; when it
  * is set, the accent replaces `primary` for that one sheet and the text drawn on it is picked automatically
  * (black or white, whichever has the higher contrast).
@@ -162,10 +166,11 @@ class SheetHostState {
     /**
      * A sheet with your own [content] under the usual title. Call [SheetScope.answer] to close it and return a
      * typed value, or [SheetScope.dismiss] to return null. Swiping it away also returns null.
+     * Use `rememberSaveable` for state inside [content] that should survive a configuration change.
      *
      * ```kotlin
      * val quantity: Int? = sheets.custom("Quantity") {
-     *     var n by remember { mutableIntStateOf(1) }
+     *     var n by rememberSaveable { mutableIntStateOf(1) }
      *     Stepper(n, onChange = { n = it })
      *     Button(onClick = { answer(n) }) { Text("Add to cart") }
      * }

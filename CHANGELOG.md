@@ -16,6 +16,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   release (after every release, weekly, and on demand).
 - The API docs (Dokka) are published on GitHub Pages: https://thalzeronlabs.github.io/compose-bottom-sheets/
 
+### Fixed
+
+- Text typed into `input` and the star picked in `rate` were lost when the activity was recreated (rotation, dark mode,
+  language) while the sheet was open; they are now saved like the pickers' state. `SheetRecreationTest` covers every
+  sheet across a real recreation and emulated process death, with the state in a ViewModel or in `remember`.
+
 ### Removed
 
 - Two internal constants (`DateRange.DAY_MILLIS`, `SheetHostState.HIDE_TIMEOUT_MS`) that leaked as public static fields
