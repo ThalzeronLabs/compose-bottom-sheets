@@ -6,11 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-02
+
+Typed text and ratings survive rotation, the public API is guarded in CI, and there is a sample app.
+
 ### Added
 
 - Public API guard: the binary-compatibility-validator dumps the public API to `sheets/api/sheets.api`, and CI runs
   `./gradlew :sheets:apiCheck`, so an API change can't slip in unnoticed. Update the dump with `./gradlew :sheets:apiDump`.
-
 - `sample/`: a one-screen app with a button for every sheet (`./gradlew :sample:installDebug`). CI builds it against
   the library, and a new **Consumer check** workflow builds it against the artifact JitPack serves for the latest
   release (after every release, weekly, and on demand).
@@ -79,6 +82,7 @@ First public release.
 - The date picker no longer clips its last column (Saturday) on 360dp-wide screens; it now uses the sheet's full
   width. Found by the new screenshot tests.
 
-[Unreleased]: https://github.com/ThalzeronLabs/compose-bottom-sheets/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ThalzeronLabs/compose-bottom-sheets/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ThalzeronLabs/compose-bottom-sheets/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ThalzeronLabs/compose-bottom-sheets/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ThalzeronLabs/compose-bottom-sheets/releases/tag/v0.1.0

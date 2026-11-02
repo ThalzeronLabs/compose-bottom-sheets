@@ -31,7 +31,7 @@ dependencyResolutionManagement {
 Then the one line (`app/build.gradle.kts`):
 
 ```kotlin
-implementation("com.github.ThalzeronLabs:compose-bottom-sheets:v0.2.0")
+implementation("com.github.ThalzeronLabs:compose-bottom-sheets:v0.2.1")
 ```
 
 `minSdk` 23. Built against `compileSdk` 37 and Compose BOM `2026.09.00`; the theme comes from your `MaterialTheme`.
@@ -256,7 +256,7 @@ for every sheet; the answer of the last one is shown at the top. Install it on a
 ./gradlew :sample:installDebug
 ```
 
-It builds against the library in this repository. With `-PsheetsVersion=v0.2.0` it uses the artifact JitPack serves
+It builds against the library in this repository. With `-PsheetsVersion=v0.2.1` it uses the artifact JitPack serves
 instead, exactly like your app would; the [Consumer check](.github/workflows/consumer.yml) workflow does that after
 every release and once a week.
 

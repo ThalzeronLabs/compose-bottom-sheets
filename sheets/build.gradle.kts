@@ -12,7 +12,7 @@ plugins {
 
 // JitPack sets VERSION to the git tag (e.g. v0.1.0); local builds fall back to the current release line.
 group = "com.github.ThalzeronLabs"
-version = providers.environmentVariable("VERSION").getOrElse("0.2.0")
+version = providers.environmentVariable("VERSION").getOrElse("0.2.1")
 
 android {
     namespace = "com.thalzeronlabs.sheets"
