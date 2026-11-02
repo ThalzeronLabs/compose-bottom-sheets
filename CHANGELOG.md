@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- Public API guard: the binary-compatibility-validator dumps the public API to `sheets/api/sheets.api`, and CI runs
+  `./gradlew :sheets:apiCheck`, so an API change can't slip in unnoticed. Update the dump with `./gradlew :sheets:apiDump`.
+
+- The API docs (Dokka) are published on GitHub Pages: https://thalzeronlabs.github.io/compose-bottom-sheets/
+
+### Removed
+
+- Two internal constants (`DateRange.DAY_MILLIS`, `SheetHostState.HIDE_TIMEOUT_MS`) that leaked as public static fields
+  in 0.2.0. They were never meant to be API.
+
 ## [0.2.0] - 2026-11-02
 
 New sheets, per-call accents and accessibility checks for every sheet.

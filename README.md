@@ -5,9 +5,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 ![minSdk 23](https://img.shields.io/badge/minSdk-23-brightgreen.svg)
 ![Jetpack Compose · Material 3](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg)
-<!-- Uncomment once GitHub Pages is enabled (Settings → Pages → Source: GitHub Actions):
 [![API docs](https://img.shields.io/badge/API%20docs-Dokka-7F52FF.svg)](https://thalzeronlabs.github.io/compose-bottom-sheets/)
--->
 
 **Bottom sheets you can `await` in Jetpack Compose — confirm, choose, date, date range, time, text input, rating,
 progress and your own content, one line each.**

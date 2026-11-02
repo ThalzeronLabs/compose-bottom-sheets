@@ -39,6 +39,10 @@ jobs:
       - name: Build the AAR
         run: ./gradlew :sheets:assembleRelease
 
+      # Fails when the public API changes without sheets/api/sheets.api being updated (./gradlew :sheets:apiDump).
+      - name: Public API check (binary-compatibility-validator)
+        run: ./gradlew :sheets:apiCheck
+
       - name: Publish to Maven Local (same task JitPack runs)
         run: ./gradlew :sheets:publishReleasePublicationToMavenLocal
 

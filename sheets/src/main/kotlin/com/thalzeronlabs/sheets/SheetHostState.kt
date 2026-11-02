@@ -198,12 +198,14 @@ class SheetHostState {
     private class InsideProgress(val host: SheetHostState) : AbstractCoroutineContextElement(InsideProgress) {
         companion object Key : CoroutineContext.Key<InsideProgress>
     }
-
-    private companion object {
-        /** Upper bound on waiting for the closing animation of a progress sheet. */
-        const val HIDE_TIMEOUT_MS = 1_000L
-    }
 }
+
+// Top-level and private, so they don't become public static fields (a `const val` in a private companion would).
+
+/** Upper bound on waiting for the closing animation of a progress sheet. */
+private const val HIDE_TIMEOUT_MS = 1_000L
+
+private const val DAY_MILLIS = 86_400_000L
 
 /** Delivers the answer of a sheet back to the suspended caller. */
 fun interface Resolver<T> {
@@ -244,10 +246,6 @@ data class DateRange(val startUtcMillis: Long, val endUtcMillis: Long) {
 
     /** Number of days in the range, counting both ends (a single-day range is 1). */
     val days: Int get() = ((endUtcMillis - startUtcMillis) / DAY_MILLIS).toInt() + 1
-
-    private companion object {
-        const val DAY_MILLIS = 86_400_000L
-    }
 }
 
 /** What the block of [SheetHostState.withProgress] can update while it runs. Safe to set from any thread. */
