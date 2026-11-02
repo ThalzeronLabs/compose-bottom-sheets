@@ -14,5 +14,5 @@
 
 - [ ] `./gradlew :sheets:verifyRoborazziDebug` passes locally
 - [ ] Screenshots re-recorded (`recordRoborazziDebug`) if the UI changed on purpose
-- [ ] New public API has KDoc
+- [ ] New public API has KDoc, and `sheets/api/sheets.api` is updated (`./gradlew :sheets:apiDump`) if the API changed
 - [ ] `CHANGELOG.md` updated under `[Unreleased]`

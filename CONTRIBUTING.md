@@ -44,6 +44,15 @@ The PNGs in `docs/screenshots/` are both the README gallery and the expected out
 - A **new sheet type** should come with a new test in `SheetScreenshotTest`, one in `SheetAccessibilityTest`, and a
   cell in the README gallery.
 
+## Public API
+
+`sheets/api/sheets.api` is the library's public API, as the binary-compatibility-validator sees it in the release AAR.
+CI runs `./gradlew :sheets:apiCheck` and fails when it changes.
+
+- Changed the API **on purpose**? Run `./gradlew :sheets:apiDump` and commit the updated file: the diff shows reviewers
+  exactly what changed for users.
+- Didn't mean to? Make the new declaration `internal` or `private`.
+
 ## Code style
 
 - Kotlin official code style (`kotlin.code.style=official`), 4-space indent, max line length ~120.
