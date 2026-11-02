@@ -43,6 +43,9 @@ jobs:
       - name: Public API check (binary-compatibility-validator)
         run: ./gradlew :sheets:apiCheck
 
+      - name: Sample app (built against the library in this repository)
+        run: ./gradlew :sample:assembleDebug
+
       - name: Publish to Maven Local (same task JitPack runs)
         run: ./gradlew :sheets:publishReleasePublicationToMavenLocal
 

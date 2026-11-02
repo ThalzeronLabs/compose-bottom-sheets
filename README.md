@@ -207,6 +207,19 @@ passed in (`confirmLabel`, `dismissLabel`, `starLabel`, the titles and messages)
 `stringResource(...)`. Built-in translations through Android string resources are tracked in
 [issue #5](https://github.com/ThalzeronLabs/compose-bottom-sheets/issues/5).
 
+## Sample app
+
+[`sample/`](sample/src/main/kotlin/com/thalzeronlabs/sheets/sample/MainActivity.kt) is a one-screen app with a button
+for every sheet; the answer of the last one is shown at the top. Install it on a device or emulator:
+
+```bash
+./gradlew :sample:installDebug
+```
+
+It builds against the library in this repository. With `-PsheetsVersion=v0.2.0` it uses the artifact JitPack serves
+instead, exactly like your app would; the [Consumer check](.github/workflows/consumer.yml) workflow does that after
+every release and once a week.
+
 ## Tests
 
 ```bash

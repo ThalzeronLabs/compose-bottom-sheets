@@ -1,0 +1,67 @@
+name: Consumer check
+
+# Builds the sample app against the artifact JitPack serves for a release, the same way an app depends on the
+# library. It catches what the in-repo build can't: a broken JitPack build, a missing transitive dependency, a POM
+# or Gradle module metadata problem.
+on:
+  # After every release (called by release.yml) ...
+  workflow_call:
+    inputs:
+      version:
+        description: Release tag to consume, e.g. v0.2.0
+        type: string
+        required: true
+  # ... weekly, and on demand from the Actions tab.
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag to consume (empty = latest release)
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick the release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED: ${{ inputs.version }}
+        run: |
+          tag="${REQUESTED:-$(gh api "repos/${{ github.repository }}/releases/latest" --jq .tag_name)}"
+          [ -n "$tag" ] || { echo "::error::No release to consume"; exit 1; }
+          echo "Consuming $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      # JitPack builds a tag on its first request, which can take minutes; Gradle would time out waiting.
+      - name: Wait for JitPack to build the release
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          url="https://jitpack.io/com/github/ThalzeronLabs/compose-bottom-sheets/${TAG}/compose-bottom-sheets-${TAG}.pom"
+          for attempt in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 300 "$url" || true)
+            [ "$code" = "200" ] && { echo "JitPack serves $TAG"; exit 0; }
+            echo "Attempt $attempt: HTTP $code, retrying in 30s"
+            sleep 30
+          done
+          echo "::error::JitPack did not serve $TAG: https://jitpack.io/#ThalzeronLabs/compose-bottom-sheets/$TAG"
+          exit 1
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build the sample against the published artifact
+        run: ./gradlew :sample:assembleDebug -PsheetsVersion=${{ steps.release.outputs.tag }}
