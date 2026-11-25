@@ -13,6 +13,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   translated label ("Drag handle") and the dismiss action. `SheetAccessibilityTest` checks the handle's own bounds in
   every dismissible sheet, and now also covers controls that only offer accessibility actions.
 
+### Documentation
+
+- Add the Awesome Kotlin listing to the README.
+
 ## [0.2.1] - 2026-11-02
 
 Typed text and ratings survive rotation, the public API is guarded in CI, and there is a sample app.
