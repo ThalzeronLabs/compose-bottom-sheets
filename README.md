@@ -281,6 +281,10 @@ That runs 61 tests on the JVM, no emulator:
 
 After an intentional UI change, re-record the images with `./gradlew :sheets:recordRoborazziDebug`.
 
+## Community listings
+
+- [Awesome Kotlin](https://github.com/Heapy/awesome-kotlin/blob/main/src/main/resources/links/Android.awesome.kts) lists this project under Android libraries.
+
 ## How I build this
 
 I use AI assistance (Claude) while I build this project: for drafting, exploring options and writing tests. I review every change myself, each one lands through a pull request with tests, and CI must pass before anything is merged. I'm responsible for every line.
